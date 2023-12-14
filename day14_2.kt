@@ -29,56 +29,39 @@ fun main() {
         return platoOut
     }
 
+    // rech./remp.
+    fun rechRemp(pO: MutableList<String>) : MutableList<String> {
+        var pIn = mutableListOf<String>()
+        for (i in 0 until pO.size) {
+            var str = pO[i]
+            while (str.contains("O.")) {
+                str = str.replace("O.", ".O")
+            }
+            pIn.add(str)
+        }
+        return pIn
+    }
+
     var pIn = inLines as MutableList
     var pOut = mutableListOf<String>()
-
     for (cycle in 0 until nbCycles) {
-
         // North
         pOut = turnPlato(pIn)
         pIn.clear()
-        for (i in 0 until pOut.size) {
-            var str = pOut[i]
-            while (str.contains("O.")) {
-                str = str.replace("O.", ".O")
-            }
-            pIn.add(str)
-        }
-
+        pIn = rechRemp(pOut)
         // West
         pOut = turnPlato(pIn)
         pIn.clear()
-        for (i in 0 until pOut.size) {
-            var str = pOut[i]
-            while (str.contains("O.")) {
-                str = str.replace("O.", ".O")
-            }
-            pIn.add(str)
-        }
-
+        pIn = rechRemp(pOut)
         // South
         pOut = turnPlato(pIn)
         pIn.clear()
-        for (i in 0 until pOut.size) {
-            var str = pOut[i]
-            while (str.contains("O.")) {
-                str = str.replace("O.", ".O")
-            }
-            pIn.add(str)
-        }
-
+        pIn = rechRemp(pOut)
         // East
         pOut = turnPlato(pIn)
         pIn.clear()
-        for (i in 0 until pOut.size) {
-            var str = pOut[i]
-            while (str.contains("O.")) {
-                str = str.replace("O.", ".O")
-            }
-            pIn.add(str)
-        }
+        pIn = rechRemp(pOut)
     }
-
     // dernière rotation pour comtage du Nord
     pOut = turnPlato(pIn)
 
