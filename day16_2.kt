@@ -1,4 +1,7 @@
 
+// à réécrire proprement en fonctions regroupant les doublons de bloc
+// écriture pourrie mais fonctionne parfaitement
+
 fun main() {
     val inLines: List<String>
 
@@ -44,14 +47,34 @@ fun main() {
     }
 
     var fluxActif = 0
-    lstFlux.add(mutableListOf())
     var posCurseur = Pair(0, 0)
-    lstFlux[fluxActif].add(posCurseur)
-    tabDirFlux.add('E')
-    tabEnergie[0][0] = '#'
-
-    var isEnd = false
     var carLu = ' '
+
+    fun cleanTabEnergie() {
+        for (l in 0..FinL) {
+            for (c in 0..FinC) {
+                tabEnergie[l][c] = '.'
+            }
+        }
+    }
+
+    fun cleanVar() {
+        lstFlux.clear()
+        tabDirFlux.clear()
+        cleanTabEnergie()
+        setVisited.clear()
+        lstVisited.clear()
+    }
+
+    fun calculEnergie() : Int {
+        var nrj = 0
+        tabEnergie.forEach { strL ->
+            strL.forEach { car ->
+                if (car != '.') nrj++
+            }
+        }
+        return nrj
+    }
 
     fun traiteCarLu(carL:Char, dir:Char, curIn:Pair<Int, Int>) : Pair<Int, Int> {
         var posCur = Pair(0, 0)
@@ -337,45 +360,192 @@ fun main() {
         return posCur
     }
 
-    // parcours du tableau initial
-    while (!isEnd) {
-        var oldCurseur = posCurseur
-        when (tabDirFlux[fluxActif]) {
-            'E' -> {
-                carLu = tabCircuit[posCurseur.first][posCurseur.second]
-                posCurseur = traiteCarLu(carLu, 'E', posCurseur)
+
+    var maxTiles = 0
+
+    // 1
+    for (i in DebL .. FinL) {
+        fluxActif = 0
+        lstFlux.add(mutableListOf())
+        posCurseur = Pair(i, DebC)
+        lstFlux[fluxActif].add(posCurseur)
+        tabDirFlux.add('E')
+        tabEnergie[i][DebC] = '#'
+        var isEnd = false
+
+        // parcours du tableau initial
+        while (!isEnd) {
+            var oldCurseur = posCurseur
+            when (tabDirFlux[fluxActif]) {
+                'E' -> {
+                    carLu = tabCircuit[posCurseur.first][posCurseur.second]
+                    posCurseur = traiteCarLu(carLu, 'E', posCurseur)
+                }
+                'W' -> {
+                    carLu = tabCircuit[posCurseur.first][posCurseur.second]
+                    posCurseur = traiteCarLu(carLu, 'W', posCurseur)
+                }
+                'N' -> {
+                    carLu = tabCircuit[posCurseur.first][posCurseur.second]
+                    posCurseur = traiteCarLu(carLu, 'N', posCurseur)
+                }
+                'S' -> {
+                    carLu = tabCircuit[posCurseur.first][posCurseur.second]
+                    posCurseur = traiteCarLu(carLu, 'S', posCurseur)
+                }
             }
-            'W' -> {
-                carLu = tabCircuit[posCurseur.first][posCurseur.second]
-                posCurseur = traiteCarLu(carLu, 'W', posCurseur)
-            }
-            'N' -> {
-                carLu = tabCircuit[posCurseur.first][posCurseur.second]
-                posCurseur = traiteCarLu(carLu, 'N', posCurseur)
-            }
-            'S' -> {
-                carLu = tabCircuit[posCurseur.first][posCurseur.second]
-                posCurseur = traiteCarLu(carLu, 'S', posCurseur)
+            // halte du flux
+            if (posCurseur == oldCurseur) {
+                if (fluxActif == lstFlux.size - 1)
+                    isEnd = true
+                else {
+                    fluxActif++
+                    posCurseur = lstFlux[fluxActif][0]
+                }
             }
         }
-        // halte du flux
-        if (posCurseur == oldCurseur) {
-            if (fluxActif == lstFlux.size - 1)
-                isEnd = true
-            else {
-                fluxActif++
-                posCurseur = lstFlux[fluxActif][0]
-            }
-        }
+
+        maxTiles = maxOf(maxTiles, calculEnergie())
+        cleanVar()
     }
 
-    var rep = 0
-    tabEnergie.forEachIndexed { ixL, strL ->
-        strL.forEachIndexed { idxC, car ->
-            if (car != '.') rep++
-            print(car)
+    // 2
+    for (i in DebL .. FinL) {
+        fluxActif = 0
+        lstFlux.add(mutableListOf())
+        posCurseur = Pair(i, FinC)
+        lstFlux[fluxActif].add(posCurseur)
+        tabDirFlux.add('W')
+        tabEnergie[i][FinC] = '#'
+        var isEnd = false
+
+        // parcours du tableau initial
+        while (!isEnd) {
+            var oldCurseur = posCurseur
+            when (tabDirFlux[fluxActif]) {
+                'E' -> {
+                    carLu = tabCircuit[posCurseur.first][posCurseur.second]
+                    posCurseur = traiteCarLu(carLu, 'E', posCurseur)
+                }
+                'W' -> {
+                    carLu = tabCircuit[posCurseur.first][posCurseur.second]
+                    posCurseur = traiteCarLu(carLu, 'W', posCurseur)
+                }
+                'N' -> {
+                    carLu = tabCircuit[posCurseur.first][posCurseur.second]
+                    posCurseur = traiteCarLu(carLu, 'N', posCurseur)
+                }
+                'S' -> {
+                    carLu = tabCircuit[posCurseur.first][posCurseur.second]
+                    posCurseur = traiteCarLu(carLu, 'S', posCurseur)
+                }
+            }
+            // halte du flux
+            if (posCurseur == oldCurseur) {
+                if (fluxActif == lstFlux.size - 1)
+                    isEnd = true
+                else {
+                    fluxActif++
+                    posCurseur = lstFlux[fluxActif][0]
+                }
+            }
         }
-        print("\n")
+
+        maxTiles = maxOf(maxTiles, calculEnergie())
+        cleanVar()
     }
-    println(rep)
+
+    // 3
+    for (i in DebC .. FinC) {
+        fluxActif = 0
+        lstFlux.add(mutableListOf())
+        posCurseur = Pair(DebL, i)
+        lstFlux[fluxActif].add(posCurseur)
+        tabDirFlux.add('S')
+        tabEnergie[DebL][i] = '#'
+        var isEnd = false
+
+        // parcours du tableau initial
+        while (!isEnd) {
+            var oldCurseur = posCurseur
+            when (tabDirFlux[fluxActif]) {
+                'E' -> {
+                    carLu = tabCircuit[posCurseur.first][posCurseur.second]
+                    posCurseur = traiteCarLu(carLu, 'E', posCurseur)
+                }
+                'W' -> {
+                    carLu = tabCircuit[posCurseur.first][posCurseur.second]
+                    posCurseur = traiteCarLu(carLu, 'W', posCurseur)
+                }
+                'N' -> {
+                    carLu = tabCircuit[posCurseur.first][posCurseur.second]
+                    posCurseur = traiteCarLu(carLu, 'N', posCurseur)
+                }
+                'S' -> {
+                    carLu = tabCircuit[posCurseur.first][posCurseur.second]
+                    posCurseur = traiteCarLu(carLu, 'S', posCurseur)
+                }
+            }
+            // halte du flux
+            if (posCurseur == oldCurseur) {
+                if (fluxActif == lstFlux.size - 1)
+                    isEnd = true
+                else {
+                    fluxActif++
+                    posCurseur = lstFlux[fluxActif][0]
+                }
+            }
+        }
+
+        maxTiles = maxOf(maxTiles, calculEnergie())
+        cleanVar()
+    }
+
+    // 4
+    for (i in DebC .. FinC) {
+        fluxActif = 0
+        lstFlux.add(mutableListOf())
+        posCurseur = Pair(FinL, i)
+        lstFlux[fluxActif].add(posCurseur)
+        tabDirFlux.add('N')
+        tabEnergie[FinL][i] = '#'
+        var isEnd = false
+
+        // parcours du tableau initial
+        while (!isEnd) {
+            val oldCurseur = posCurseur
+            when (tabDirFlux[fluxActif]) {
+                'E' -> {
+                    carLu = tabCircuit[posCurseur.first][posCurseur.second]
+                    posCurseur = traiteCarLu(carLu, 'E', posCurseur)
+                }
+                'W' -> {
+                    carLu = tabCircuit[posCurseur.first][posCurseur.second]
+                    posCurseur = traiteCarLu(carLu, 'W', posCurseur)
+                }
+                'N' -> {
+                    carLu = tabCircuit[posCurseur.first][posCurseur.second]
+                    posCurseur = traiteCarLu(carLu, 'N', posCurseur)
+                }
+                'S' -> {
+                    carLu = tabCircuit[posCurseur.first][posCurseur.second]
+                    posCurseur = traiteCarLu(carLu, 'S', posCurseur)
+                }
+            }
+            // halte du flux
+            if (posCurseur == oldCurseur) {
+                if (fluxActif == lstFlux.size - 1)
+                    isEnd = true
+                else {
+                    fluxActif++
+                    posCurseur = lstFlux[fluxActif][0]
+                }
+            }
+        }
+
+        maxTiles = maxOf(maxTiles, calculEnergie())
+        cleanVar()
+    }
+
+    println(maxTiles)
 }
