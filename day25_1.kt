@@ -49,7 +49,6 @@ fun main() {
            g.addVertex(key.key)
         }
 
-        var setEdges = mutableSetOf<Pair<String, String>>()
         mapCodes.forEach {
             var v1 = it.key
             for (v2 in it.value) {
